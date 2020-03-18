@@ -1,0 +1,63 @@
+#dotParse("//$config.getStringProperty('CMS_DEFAULT_HOST')/application/includes/init.vtl")
+<!doctype html>
+<html class="no-js" lang="$!{DOTLANGUAGE}">
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!-- Template:$!{dotThemeLayout.title}-->
+<head>
+	#if($dotTheme.htmlHead)
+		#dotParse("${dotTheme.path}html_head.vtl")
+	#end
+</head>
+
+<body>
+#evaluate("$!{Template.page.pre}") ## Template Parameters: Page Wrapper
+
+#if ($dotThemeLayout.header)
+	#evaluate("$!{Template.header.pre}") ## Template Parameters: Header Wrapper
+	#dotParse("${dotTheme.path}header.vtl")
+	#evaluate("$!{Template.header.post}")
+#end
+
+#evaluate("$!{Template.main.pre}") ## Template Parameters: Main Content Wrapper
+
+#foreach($row in $dotThemeLayout.body.rows)
+	#set ($layoutCurrentRow = $foreach.index)
+	#if($EDIT_MODE) <div style="position:relative;width:100%;"> #end ## Hack because container controls will not display in flexbox layouts
+
+	#evaluate($!{Template.row.pre}) ## Template Parameters: Row Wrapper
+	<!-- Layout Current Row $layoutCurrentRow -->
+
+	<!-- Start Containers -->
+	#foreach ($column in $row.columns)
+		## TODO: Don't attempt to render empty containers
+		###VelocityContext()
+		##<pre>$column</pre>
+		#TemplateColumnWidth($column.widthPercent, 'Pre') ## Template Parameters: Column Wrapper
+		$render.eval($column.draw())
+		#TemplateColumnWidth($column.widthPercent, 'Post')
+	#end
+
+	#evaluate("$!{Template.row.post}")
+
+	#if($EDIT_MODE) </div> #end
+#end
+<!-- End containers -->
+
+
+#evaluate("$!{Template.main.post}")
+
+#if($dotThemeLayout.footer)
+	#evaluate("$!{Template.footer.pre}") ## Template Parameters: Footer Wrapper
+	#dotParse("${dotTheme.path}footer.vtl")
+	#evaluate("$!{Template.footer.post}")
+#end
+
+
+#evaluate("$!{Template.page.post}")
+
+#dotParse("${dotTheme.path}bottom.vtl")
+</body>
+</html>

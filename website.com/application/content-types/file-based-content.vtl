@@ -1,0 +1,12 @@
+#set($_fileBasedContent=$dotcontent.find($contentletId))
+#ContentletInfo($_fileBasedContent)
+#if($_fileBasedContent.file)
+#set($_contentFileAsset = $dotcontent.find($_fileBasedContent.file.identifier))
+#set($_fileAssetHost = $_contentFileAsset.host.hostName)
+#set($_fileAssetPath = "//" + $_fileAssetHost + $filetool.getFile($_contentFileAsset.identifier, true).getURI())
+#if($_contentFileAsset.fileName.contains('.vtl') || $_contentFileAsset.fileName.contains('.html'))
+#dotParse("$!{_fileAssetPath}")
+#elseif($_contentFileAsset.fileName.contains('.md'))
+$markdown.parseFile($_fileAssetPath)
+#end
+#end

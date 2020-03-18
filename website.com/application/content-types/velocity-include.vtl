@@ -1,0 +1,8 @@
+#set($_vtlInclude=$dotcontent.find($contentletId))
+#ContentletInfo($_vtlInclude)
+#if($_vtlInclude.velocityFile)
+#dotParse("$filetool.getFile(${_vtlInclude.velocityFile.identifier},true).getURI()")
+#end
+#if($_vtlInclude.code)
+#evaluate("$!{_vtlInclude.code}")
+#end

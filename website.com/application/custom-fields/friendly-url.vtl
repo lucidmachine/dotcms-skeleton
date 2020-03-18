@@ -1,0 +1,59 @@
+## Friendly URL Title Generator
+#set ($cusFieldVarName = "$!{field.velocityVarName}")
+
+<script>
+var urlPathPrimaryInput, urlPathSecondaryInput, urlPathDisplayElement, urlPathCustomField;
+var secondaryPristine = true;
+
+function kebabCaseifyText (text) {
+	var out = text.toLowerCase();
+	out = out.replace(/^\s+|\s+$/g, "");
+	out = out.replace(/[^a-zA-Z 0-9]+/g,' ');
+	out = out.replace(/\s/g, "-");
+	while(out.indexOf("--") > -1){
+		out = out.replace("--",'-');
+	}
+	//while(out.lastIndexOf("-") == out.length -1 ){
+	//	out = out.substring(0, out.length -1);
+	//}
+	return out;
+}
+
+
+window.addEventListener("DOMContentLoaded", function (e) {
+
+	urlPathPrimaryInput = document.getElementById("$!{primaryInputField}"); // Initial Input field
+	urlPathSecondaryInput = document.getElementById("urlTitleSecondaryManualInput"); // Secondary Input for manual changes (without changing initial field value)
+	urlPathDisplayElement = document.getElementById("urlPathDisplay"); // Display Field
+	urlPathCustomField = document.getElementById("$!{cusFieldVarName}"); // Output Field
+
+	urlPathPrimaryInput.addEventListener("keyup", function(event) {
+		if (secondaryPristine === true) {
+			if (urlPathPrimaryInput.value && urlPathPrimaryInput.value.length > 0) {
+				var outText = kebabCaseifyText(urlPathPrimaryInput.value);
+
+				urlPathSecondaryInput.value = outText;
+				urlPathCustomField.value = outText;
+
+				urlPathDisplayElement.innerText = outText;
+			}
+		}
+	});
+
+	urlPathSecondaryInput.addEventListener("keyup", function(event) {
+		if (urlPathSecondaryInput.value && urlPathSecondaryInput.value.length > 0) {
+			secondaryPristine = false;
+			var outText = kebabCaseifyText(urlPathSecondaryInput.value);
+
+			urlPathSecondaryInput.value = outText; // Cleanup invalid chars
+			urlPathCustomField.value = outText;
+
+			urlPathDisplayElement.innerText = outText;
+		}
+	});
+});
+</script>
+
+<p><span class="contentHint">Manual URL Title Changes (Manual changes will override $!{primaryInputField} and not allow $!{primaryInputField} to modify this value)</span></p>
+<input type="text" id="urlTitleSecondaryManualInput" name="displayURLTitle"  class="dijitTextBox" style="width:100%" value="$!{value}">
+<div>URL Title: <span id="urlPathDisplay">$!{value}</span></div>

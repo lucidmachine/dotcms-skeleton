@@ -1,0 +1,17 @@
+
+#set ($kbArticle = $dotcontent.find($contentletId))
+
+#if ($UtilMethods.isSet($kbArticle.heading))
+	<h3>$!{kbArticle.heading}</h3>
+#end
+
+#if ($UtilMethods.isSet($kbArticle.subheading))
+	<h4>$!{kbArticle.subheading}</h4>
+#end
+
+#if ($UtilMethods.isSet($kbArticle.body))
+	<div>
+		#evaluate("$!{kbArticle.body}")
+	</div>
+#end
+

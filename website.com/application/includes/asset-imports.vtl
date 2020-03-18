@@ -1,0 +1,51 @@
+#set ($assetImports = { 'head': { 'css': "", 'js': "", 'vtljs': "" }, 'bottom': { 'js': "", 'vtljs': "", 'css': "" }})
+
+#if($UtilMethods.isSet($dotPageContent.assetImports) && $dotPageContent.assetImports.length() > 0)##
+	#set ($assetImports.head.css = "$!{assetImports.head.css}$!{newline}")
+	#foreach($assetLine in $dotPageContent.assetImports.split("\u000A"))
+		#set($assetSplit = $assetLine.split(','))
+		#if($assetSplit.getClass().getName() == "[Ljava.lang.String;" && $assetSplit.size() == 2 && $assetSplit.get(0) == "css")
+			#set ($assetImports.head.css = "$!{assetImports.head.css}<link rel=${esc.q}stylesheet${esc.q} href=${esc.q}$!{assetSplit.get(1)}${esc.q}>$!{newline}")
+		#end
+	#end
+
+	#set ($assetImports.bottom.css = "$!{assetImports.bottom.css}$!{newline}")
+	#foreach($assetLine in $dotPageContent.assetImports.split("\u000A"))
+		#set($assetSplit = $assetLine.split(','))
+		#if($assetSplit.getClass().getName() == "[Ljava.lang.String;" && $assetSplit.size() == 2 && $assetSplit.get(0) == "css_bottom")
+			#set ($assetImports.bottom.css = "$!{assetImports.bottom.css}<link rel=${esc.q}stylesheet${esc.q} href=${esc.q}$!{assetSplit.get(1)}${esc.q}>$!{newline}")
+		#end
+	#end
+
+	#set ($assetImports.head.js = "$!{assetImports.head.js}$!{newline}")
+	#foreach($assetLine in $dotPageContent.assetImports.split("\u000A"))
+		#set($assetSplit = $assetLine.split(','))
+		#if($assetSplit.getClass().getName() == "[Ljava.lang.String;" && $assetSplit.size() == 2 && $assetSplit.get(0) == "js_head")##
+			#set ($assetImports.head.js = "$!{assetImports.head.js}<script src=${esc.q}$!{assetSplit.get(1)}${esc.q}></script>$!{newline}")
+		#end
+	#end
+
+	#set ($assetImports.head.vtljs = "$!{assetImports.head.vtljs}$!{newline}")
+	#foreach($assetLine in $dotPageContent.assetImports.split("\u000A"))
+		#set($assetSplit = $assetLine.split(','))
+		#if($assetSplit.getClass().getName() == "[Ljava.lang.String;" && $assetSplit.size() == 2 && $assetSplit.get(0) == "vtljs_head")##
+			#set ($assetImports.head.vtljs = "$!{assetImports.head.vtljs}<script>#{dotParse}($!{assetSplit.get(1)})</script>$!{newline}")
+		#end
+	#end
+
+	#set ($assetImports.bottom.js = "$!{assetImports.bottom.js}$!{newline}")
+	#foreach($assetLine in $dotPageContent.assetImports.split("\u000A"))
+		#set($assetSplit = $assetLine.split(','))
+		#if($assetSplit.getClass().getName() == "[Ljava.lang.String;" && $assetSplit.size() == 2 && $assetSplit.get(0) == "js")##
+			#set ($assetImports.bottom.js = "$!{assetImports.bottom.js}<script src=${esc.q}$!{assetSplit.get(1)}${esc.q}></script>$!{newline}")
+		#end
+	#end
+
+	#set ($assetImports.bottom.vtljs = "$!{assetImports.bottom.vtljs}$!{newline}")
+	#foreach($assetLine in $dotPageContent.assetImports.split("\u000A"))
+		#set($assetSplit = $assetLine.split(','))
+		#if($assetSplit.getClass().getName() == "[Ljava.lang.String;" && $assetSplit.size() == 2 && $assetSplit.get(0) == "vtljs")##
+			#set ($assetImports.bottom.vtljs = "$!{assetImports.bottom.vtljs}<script>#{dotParse}($!{assetSplit.get(1)})</script>$!{newline}")
+		#end
+	#end
+#end

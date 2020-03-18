@@ -1,0 +1,32 @@
+#macro (GenerateButton $_buttonData)
+#set ($out = '')
+#if ($_buttonData.getClass().getName() == $Classes.string)
+#set ($_buttonData = $json.generate($_buttonData))
+#end
+#if ($_buttonData.getClass().getName() == $Classes.json && $_buttonData.tag.getClass().getName() == $Classes.string && $_buttonData.tag.length() > 0)
+#set ($out = "<$!{_buttonData.tag}")
+#if ($_buttonData.class.getClass().getName() == $Classes.string && $_buttonData.class.length() > 0)
+#set ($out = "${out} class=\"$!{_buttonData.class}\"")
+#end
+#if ($_buttonData.tag == 'a')
+#if ($_buttonData.link.getClass().getName() == $Classes.string && $_buttonData.link.length() > 0)
+#set ($out = "${out} href=\"$!{_buttonData.link}\"")
+#end
+#if ($_buttonData.target.getClass().getName() == $Classes.string && $_buttonData.target.length() > 0)
+#set ($out = "${out} target=\"$!{_buttonData.target}\"")
+#end
+#elseif ($_buttonData.tag == 'button')
+#if ($_buttonData.value.getClass().getName() == $Classes.string && $_buttonData.value.length() > 0)
+#set ($out = "${out} value=\"$!{_buttonData.value}\"")
+#end
+#end
+#if ($_buttonData.attributes.getClass().getName() == $Classes.string && $_buttonData.attributes.length() > 0)
+#set ($out = "${out} $!{_buttonData.attributes}")
+#end
+#set ($out = "${out}>")
+#if ($_buttonData.text.getClass().getName() == $Classes.string && $_buttonData.text.length() > 0)
+#set ($out = "${out}$!{_buttonData.text}</$!{_buttonData.tag}>")
+#end
+#end
+$!{out}
+#end

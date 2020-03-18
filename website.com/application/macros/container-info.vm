@@ -1,0 +1,12 @@
+#macro (ContainerInfo)
+	#if ($EDIT_MODE)
+	<div style="position: relative;">
+		<div class="container-info">
+			<h5>Container: $CONTAINER_NAME ($column.containers[0].identifier)</h5>
+			#if ($UtilMethods.isSet($dotPageContent))
+				<h6>Page Layout: $dotcontent.find("${dotPageContent.layout}").description (${dotPageContent.layout})</h6>
+			#end
+		</div>
+	</div>
+	#end
+#end

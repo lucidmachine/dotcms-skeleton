@@ -1,0 +1,12 @@
+#set($_contentWidget=$dotcontent.find($contentletId))
+#ContentletInfo($_contentWidget)
+#if($_contentWidget.velocityFile)
+#set($_vtlFileAsset = $dotcontent.find($_contentWidget.velocityFile.identifier))
+#set($_vtlHostName = $_vtlFileAsset.host.hostName)
+#set($_vtlFilePath = "//" + $_vtlHostName + $filetool.getFile($_vtlFileAsset.identifier, true).getURI())
+<!-- $!{_vtlFilePath} -->
+#dotParse("$!{_vtlFilePath}")
+#end
+#if($UtilMethods.isSet($_contentWidget.code))
+#evaluate("$!{_contentWidget.code}")
+#end

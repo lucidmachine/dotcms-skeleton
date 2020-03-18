@@ -1,0 +1,172 @@
+## Globals/Constants
+
+## Hosts
+#set ($HOST_CURRENT = "$host.hostName")
+#set ($HOST_DEFAULT = $config.getStringProperty("CMS_SHARED_HOST"))
+#set ($HOST_SHARED = $config.getStringProperty("CMS_DEFAULT_HOST"))
+#set ($HOST_SHARED_ASSETS = $config.getStringProperty("CMS_SHARED_ASSETS_DEV"))
+
+## Directories
+#set ($APP_BASE = '/application')
+#set ($APP_INC = '/application/includes')
+#set ($APP_CT = '/application/content-types')
+#set ($APP_CNT = '/application/containers')
+#set ($APP_TPL = '/application/template-custom')
+#set ($APP_UTIL = '/application/util')
+#set ($APP_WIDGETS = '/application/widgets')
+
+## Shared Host Directories
+#set ($SHARED_APP_BASE = "//$!{HOST_SHARED}$!{APP_BASE}")
+#set ($SHARED_APP_INC = "//$!{HOST_SHARED}$!{APP_INC}")
+#set ($SHARED_APP_UTIL = "//$!{HOST_SHARED_ASSETS}$!{APP_UTIL}")
+#set ($SHARED_APP_TPL = "//$!{HOST_SHARED}$!{APP_TPL}")
+#set ($SHARED_APP_ASSETS = "//$!{HOST_SHARED_ASSETS}$!{APP_BASE}")
+
+## Language
+#set ($DOTLANGUAGE = $config.getStringProperty('DEFAULT_LANGUAGE'))
+#if ($config.getStringProperty('CHARSET').split('\;').get(1).split('\=').get(1))
+	#set ($DOTCHARSET = $config.getStringProperty('CHARSET').split('\;').get(1).split('\=').get(1).toLowerCase())
+#end
+
+#set ($DOTLOG_BORDER = $UtilMethods.padToLength("*", 80, "*"))
+#set ($DOTLOG_WRAP = "$!{newline}$!{DOTLOG_BORDER}$!{newline}")
+
+## Macros
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/velocity-context.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/session-dump.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/header-dump.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/config-dump.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/content-dump.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/json-get.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/container-info.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/contentlet-info.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/template-column.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/slugify.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/truncate-string.vm")
+#dotParse("//$!{HOST_SHARED}$!{APP_BASE}/macros/button.vm")
+
+## Utility Vars
+#set ($NOW = $date.calendar.getTimeInMillis())
+#set ($JSON_PRE = '{${esc.q}data${esc.q}:')
+#set ($JSON_POST = '}')
+#set ($QHOST = '+(conhost:48190c8c-42c4-46af-8d1a-0cd5db894797 conhost:SYSTEM_HOST)')
+#set ($REST_PREFIX = $config.getStringProperty("WEBSERVICE_API_HOST","//www.will2love.com/api"))
+#set ($REST_TIMEOUT = 30000)
+#set ($ASSET_DEV_MODE = "") ## Change to ".min" for production
+
+#set ($HTTP_REFERRER = "$request.getHeader('referer')")
+#set ($HTTP_JAVAX_FORWARD_URI = "$request.getAttribute('javax.servlet.forward.request_uri')")
+#set ($HTTP_RESPONSE_STATUS = "$request.getAttribute('javax.servlet.error.status_code')")
+
+## User Session Cookie
+#set ($USER_PERSISTENCE_ID = $session.getAttribute("com.dotcms.visitor").dmid.toString())
+
+## Debug Mode
+#set ($DEBUG_MODE = false)
+#if ($UtilMethods.isSet($session.getAttribute("DEBUG_MODE")))
+	#if ($session.getAttribute("DEBUG_MODE") == true)
+		#set ($DEBUG_MODE = true)
+	#elseif ($session.getAttribute("DEBUG_MODE") == false)
+		#set ($DEBUG_MODE = false)
+	#end
+#end
+
+## Search Engine Request 
+#set ($HTTP_IS_SEARCH_ENGINE = false)
+#set ($HTTP_IS_SITESEARCH = false)
+#set ($HTTP_USERAGENT = "$request.getHeader('User-Agent')")
+#if ($HTTP_USERAGENT == "DOTCMS-SITESEARCH")
+	#set ($HTTP_IS_SEARCH_ENGINE = true)
+	#set ($HTTP_IS_SITESEARCH = true)
+#end
+
+## Request/Response
+#set ($REQURL = "$request.getRequestURL()")
+#set ($REQBASEURL = "$REQURL.substring(0, $REQURL.indexOf($request.getRequestURI()))")
+#set ($REQBASEURL = $REQBASEURL.replaceAll("\:[0-9]+",''))
+
+## If behind proxy (ie cloudfront), change og:url to match requested hostname
+#set ($hasCacheProxy = false)
+#set ($cacheProxyProtocol = "$!{request.getScheme()}")
+#set ($cacheProxyHost = "$!{request.getServerName()}")
+#foreach ($headerName in $request.getHeaderNames())
+	#if ($headerName == "x-forwarded-proto")
+		#if ($request.getHeader($headerName).contains("http"))
+			#set ($cacheProxyProtocol = $request.getHeader($headerName))
+		#end
+	#end
+	#if ($headerName == "x-forwarded-server")
+		#if ($request.getHeader($headerName) != $request.getServerName())
+			#set ($hasCacheProxy = true)
+			#set ($cacheProxyHost = "$request.getHeader($headerName)")
+			#set ($HTTP_X_FORWARDED_FOR = "$request.getHeader($headerName)")
+		#end
+	#end
+#end
+#if ($hasCacheProxy)
+	#set ($REQBASEURL = "$!{cacheProxyProtocol}://$!{cacheProxyHost}")
+#end
+#set ($REQURI = $request.getRequestURI().replaceAll('(\/index)+','/'))
+
+## If URL Mapped, change URI to virtual Path
+#if ($UtilMethods.isSet($URLMapContent) && $URLMapContent.getClass().getName() == "com.dotcms.rendering.velocity.viewtools.content.ContentMap")
+	#set ($REQURI = $request.getAttribute("javax.servlet.forward.servlet_path").replaceAll('(\/index)+','/'))
+#end
+
+#set ($REQ_URI_PREFIX = $REQURI.substring(1).split('\u002F').get(0))
+
+## Classes
+#set ($Classes = {
+	'boolean': "java.lang.Boolean",
+	'string': "java.lang.String",
+	'integer': "java.lang.Integer",
+	'number': "java.lang.Long",
+	'list': "java.util.ArrayList",
+	'stringList': "[Ljava.lang.String;",
+	'map': "java.util.LinkedHashMap",
+	'hashmap': "java.util.HashMap",
+	'date': "java.util.Date",
+	'calendar': "java.util.GregorianCalendar",
+	'keyset': "com.dotmarketing.viewtools.content.ContentMap$1",
+	'json': "com.dotmarketing.util.json.JSONObject",
+	'jsonArray': "com.dotmarketing.util.json.JSONArray",
+	'contentlet': "com.dotcms.rendering.velocity.viewtools.content.ContentMap",
+	'dotcontentPull': "com.dotmarketing.util.PaginatedArrayList",
+	'fileAsset': "com.dotmarketing.viewtools.content.FileAssetMap",
+	'context': "org.apache.velocity.tools.view.context.ChainedContext",
+	'radioField': "com.dotmarketing.viewtools.content.RadioMap",
+	'checkboxField': 'com.dotmarketing.viewtools.content.CheckboxMap'
+})
+
+#set ($dFormats = {
+	'dateAndTime': "MM/dd/YYYY hh:mm a",
+	'dateOnly': "MM/dd/YYYY",
+	'api': "YYYY-MM-dd HH:mm:ss.S",
+	'luceneDate': "YYYYMMdd"
+})
+
+## HTML Elements
+#set ($HTML_EL = {
+	'PRINT_BUTTON': '<a class="btn btn-default hidden-print" href="javascript:window.print();">Print</a>'
+})
+
+## Workflows
+#set ($workflows =  {
+	'publish': "b9d89c803d",
+	"unpublish": "38efc763d7",
+	"archive": "4da13a425d",
+	"delete": "777f1c6bc8"
+})
+
+
+## Options/Utilities
+#set ($chars =  {
+	'space': ' ',
+	'tab': '	',
+	'quote': '"',
+	'squote': "'",
+	'dollar': '$',
+	'newline': '
+'
+})
+#set ($CACHEBUST = "t=${NOW}")## Empty String to remove cache busting
