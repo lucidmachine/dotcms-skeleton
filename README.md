@@ -67,6 +67,5 @@ module.exports = [
  - Files you're working on are locked.
  - Do not edit files that are locked by someone else.
 - Gulp will listen for file changes configured in `gulp-config/gulp-sites.js` `watchpaths` array.
-- Directories must already exist in dotCMS or the file won't upload (you'll get a 500). You can either create the directory in dotCMS, or use a DAV client. I don't know if this is a limitation of the module, or some other bug. Feel free to fix it 🐞
-- You can create new files on the fly, so long as the parent directory exists, but the initial save will return 500, but subsequent writes will save properly. Avoid saving empty files, dotCMS doesn't like them.
-- If you want to create a bunch of new files in the tree, I recommend using a client. Otherwise, you'll need to open each new file and write to it manually.
+- Avoid saving empty files, dotCMS doesn't like them.
+- If you want to create a bunch of new files in the tree, I recommend using a client. Otherwise, you'll need to update each file's modified date with a utility like `touch` or open each new file and write to it manually.
